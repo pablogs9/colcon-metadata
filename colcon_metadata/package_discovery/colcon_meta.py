@@ -87,7 +87,13 @@ class ColconMetadataDiscovery(PackageDiscoveryExtensionPoint):
             "Using configuration from '%s'" % meta_path.absolute())
         if 'names' in data and isinstance(data['names'], dict):
             for name, v in data['names'].items():
-                metadata_by_name[name].update(v)
+                for key in v:
+                    if key not in metadata_by_name[name]:
+                        metadata_by_name[name][key] = v[key]
+                    elif type(metadata_by_name[name][key]) is list:
+                        metadata_by_name[name][key].extend(v[key])
+                    else:
+                        metadata_by_name[name][key] = v[key]
         if 'paths' in data and isinstance(data['paths'], dict):
             for path, value in data['paths'].items():
                 path = meta_path.parent / path
